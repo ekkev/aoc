@@ -2,7 +2,7 @@ const DIMS = [['x', 'vx'], ['y', 'vy'], ['z', 'vz']];
 
 const parseMoons = text => text.split('\n').map(moonStr => {
         let moon = {};
-        moonStr.match(/([-\d]+)/g).forEach((pos, i) => moon[DIMS[i][0]] = parseInt(pos, 10) );
+        moonStr.match(/([-\d]+)/g).forEach((pos, i) => moon[DIMS[i][0]] = parseInt(pos, 10));
         DIMS.forEach(([dim, vdim]) => moon[vdim] = 0);
         return moon;
     });
@@ -11,7 +11,6 @@ const velocity = (a, b, dim) => a[dim] < b[dim] ? 1 : (a[dim] > b[dim] ? -1 : 0)
 
 const calculateVelocity = (moons, [dim, vdim]) => moons.forEach(a => moons.forEach(b => a[vdim] += velocity(a, b, dim)));
 const move = (moons, [dim, vdim]) => moons.forEach(moon => moon[dim] += moon[vdim]);
-const positionId = (moons, [dim]) => moons.map(moon => moon[dim]).join(',');
 const velocitiesZero = (moons, vdim) => moons.map(moon => moon[vdim] === 0).reduce((prev, cur) => prev && cur, true);
 const findCommonInterval = (v1, v2) => {
     let res = v1;
