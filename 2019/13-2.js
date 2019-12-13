@@ -140,8 +140,7 @@ const solve = programCode => {
 
     const map = [];
     let score = 0;
-    let ballX;
-    let paddleX;
+    const tilex = {};
     
     const handleMove = (x, y, id) => {
         if (x === -1) {
@@ -154,17 +153,10 @@ const solve = programCode => {
         map[y][x] = id;
         draw(map);
 
-        switch (id) {
-            case Tiles.Paddle:
-                paddleX = x;
-                break;
-            case Tiles.Ball:
-                ballX = x;
-                break;
-        }
+        tilex[id] = x;
     }
 
-    const getJoystickPosition = () => Math.sign(ballX - paddleX);
+    const getJoystickPosition = () => Math.sign(tilex[Tiles.Ball] - tilex[Tiles.Paddle]);
 
     cpu.runWithIO(gatherThreeInputs(handleMove), getJoystickPosition);
     draw(map);
