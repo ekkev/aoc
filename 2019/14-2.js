@@ -1,39 +1,3 @@
-
-// const costs = {};
-// const storage = {};
-
-// const sum = arr => arr.reduce((a,b) => a+b, 0);
-// const parseElement = str => str.split(' ').map((v, i) => i ? v : parseInt(v, 10));
-// const parseCosts = (input) => {
-//     const addCost = (to, from) => {
-//         costs[to[1]] = [to[0], from.map(parseElement)];
-//     }
-//     input.split('\n').forEach(row => {
-//         let m = row.match(/\d+ \w+/g);
-//         addCost(parseElement(m.pop()), m);
-//     });
-//     return costs;
-// }
-
-
-// const getOreFor = (needed, element) => {
-//     if (element === 'ORE') {
-//         return needed;
-//     }
-
-//     if (element in storage) {
-//         let consumeFromStorage = Math.min(storage[element], needed);
-//         storage[element] -= consumeFromStorage;
-//         needed -= consumeFromStorage;
-//     } else {
-//         storage[element] = 0;
-//     }
-    
-//     let batches = Math.ceil(needed / costs[element][0]);
-//     storage[element] += batches * costs[element][0] - needed;
-//     return sum(costs[element][1].map(([sourceNeeded, sourceElement]) => getOreFor(batches * sourceNeeded, sourceElement)));
-// }
-
 const { getOreFor, parseCosts } = require('./14-1');
 
 const solve = input => {
