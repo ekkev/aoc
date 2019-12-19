@@ -1,7 +1,7 @@
 const { prettyPicture } = require('./15-2');
 
 const [X, Y] = [0, 1];
-const START = '@';
+const STARTS = ['1', '2', '3', '4'];
 const [a, z, A, Z] = ['a', 'z', 'A', 'Z'].map(v => v.charCodeAt());
 const isKey = chr => chr.charCodeAt() >= a && chr.charCodeAt() <= z;
 const isDoor = chr => chr.charCodeAt() >= A && chr.charCodeAt() <= Z;
@@ -21,10 +21,10 @@ const createMap = input => {
         if (v === '\n') {
             x = 0; y++;
         } else {
-            if (v === START || isKey(v) || isDoor(v)) {
+            if (STARTS.includes(v) || isKey(v) || isDoor(v)) {
                 locations[v] = [x, y];
             }
-            if (v === START) {
+            if (STARTS.includes(v)) {
                 v = '.';
             }
             setMap(x, y, v);
@@ -87,8 +87,14 @@ const reachableKeys = (keyPaths, collectedKeys) =>
 const solve = (input) => {
     const [map, locations] = createMap(input);
     const keysToCollect = new Set(Object.keys(locations).filter(isKey));
-    const doorsOnTheWay = shortestPathtoEachKey(map, locations[START]);
 
+    const robotForKey = {};
+    let doorsOnTheWay = {};
+    STARTS.forEach(robot => {
+        const keysFound = shortestPathtoEachKey(map, locations[robot])
+        doorsOnTheWay = {...doorsOnTheWay, ...keysFound};
+        Object.keys(keysFound).forEach(key => robotForKey[key] = robot);
+    });
     const getMapRow = y => map.has(y) ? map.get(y) : map.set(y, new Map).get(y);
     const getMap = ([x, y]) => getMapRow(y).get(x);
 
@@ -137,10 +143,13 @@ const solve = (input) => {
         return knownShortestPath;
     }
 
+    const robotPos = Object.fromEntries(STARTS.map(v => [v, locations[v]]));
+
     let minStepsAllKeys = Infinity;
     const pathCache = new Map;
-    const getPathCacheId = (pos, keysCollected) => `${getPosId(pos)}:${[...keysCollected].sort().join('')}`
-    const explorePaths = (pos, steps = 0,  keysCollected = []) => {
+    const getPathCacheId = (robotPos, keysCollected) => `${Object.values(robotPos).map(getPosId).join(',')}:${[...keysCollected].sort().join('')}`
+
+    const explorePaths = (robotPos, steps = 0,  keysCollected = []) => {
         let reachable = reachableKeys(doorsOnTheWay, keysCollected);
         if (keysCollected.length === keysToCollect.size) {
             return steps;
@@ -149,14 +158,14 @@ const solve = (input) => {
         if (!reachable.length || steps === Infinity)
             return Infinity;
 
-        const cacheId = getPathCacheId(pos, keysCollected);
+        const cacheId = getPathCacheId(robotPos, keysCollected);
         if (pathCache.has(cacheId)) {
-            const fromCache = pathCache.get(cacheId);
-            return fromCache[0] - fromCache[1] + steps;
+            const [cacheShortest, cacheSteps] = pathCache.get(cacheId);
+            return cacheShortest - cacheSteps + steps;
         }
 
         reachable = reachable
-                        .map(key => [shortestPath(pos, locations[key]), key])
+                        .map(key => [shortestPath(robotPos[robotForKey[key]], locations[key]), key])
                         .filter(([distance, key]) => steps + distance < minStepsAllKeys)
                         .sort(([a], [b]) => a-b);
 
@@ -164,7 +173,9 @@ const solve = (input) => {
         let shortest = Infinity;
 
         for (let [distance, key] of reachable) {
-            let pathLength = explorePaths(locations[key], steps + distance, [...keysCollected, key]);
+            let newRobotPos = {...robotPos}
+            newRobotPos[robotForKey[key]] = locations[key];
+            let pathLength = explorePaths(newRobotPos, steps + distance, [...keysCollected, key]);
             if (!keysCollected.length && pathLength < minStepsAllKeys)
                 minStepsAllKeys = pathLength;
             if (pathLength < shortest)
@@ -175,35 +186,38 @@ const solve = (input) => {
         return shortest;
     }
 
-    return explorePaths(locations[START]);
+    return explorePaths(robotPos);
 }
 
-let test = `########################
-#...............b.C.D.f#
-#.######################
-#.....@.a.B.c.d.A.e.F.g#
-########################`;
 
-console.log(solve(test), 132, 'b, a, c, d, f, e, g');
+let test = `#######
+#a.#Cd#
+##1#2##
+#######
+##3#4##
+#cB#Ab#
+#######`
+console.log(solve(test), 8);
 
-test = `#################
-#i.G..c...e..H.p#
-########.########
-#j.A..b...f..D.o#
-########@########
-#k.E..a...g..B.n#
-########.########
-#l.F..d...h..C.m#
-#################`;
-console.log(solve(test), 136, 'a, f, b, j, g, n, h, d, l, o, e, p, c, i, k, m');
+test = `#############
+#DcBa.#.GhKl#
+#.###1#2#I###
+#e#d#####j#k#
+###C#3#4###J#
+#fEbA.#.FgHi#
+#############`;
+console.log(solve(test), 32);
 
-test = `########################
-#@..............ac.GI.b#
-###d#e#f################
-###A#B#C################
-###g#h#i################
-########################`;
-console.log(solve(test), 81, 'a, c, f, i, d, g, b, e, h');
+test = `############
+#g#f.D#..h#l#
+#F###e#E###.#
+#dCba1#2BcIJ#
+#############
+#nK.L3#4G...#
+#M###N#H###.#
+#o#m..#i#jk.#
+#############`;
+console.log(solve(test), 72)
 
 test = `#################################################################################
 #.................C...#...#.......#.....#.#.........#.R.....#.....B............t#
@@ -244,9 +258,9 @@ test = `########################################################################
 #.#.###.###.#.#######.#.###.#####.#####.#.###.#.#.#.#.###########.#.#########.#.#
 #.#.#.#...#...#.#.....#...#.....#.#.....#.#...#.#.#.#...#.........#.#.........#.#
 #.#.#.###.#####.#.#######.#####.###.#####.#.#####.#.###.#.#########.#.#########.#
-#.......#.....................#...................#.....#.........#.............#
-#######################################.@.#######################################
-#.......#...........#.....#.....................#.....#.......#...........#.....#
+#.......#.....................#........1#2........#.....#.........#.............#
+#################################################################################
+#.......#...........#.....#............3#4......#.....#.......#...........#.....#
 #.#######.#.#######.#.###.#.#####.#####.#.#.#####.#.#.#######.#.#########.#####.#
 #.#.......#.....#...#...#.#.#...#.....#.#.#.......#.#.........#.#.......#...#...#
 #.#.###########.#.#####.###.#.#.#####.#.#.#####.###.###########.#.###.#.###.#.###
@@ -286,4 +300,4 @@ test = `########################################################################
 #.#########.#.#####.###.#####.#.###.#.#.#.###.#.#.#.###.#.#########.#.#.#######.#
 #...........#..r....M.#.......#v......#.#.....#.#.......#.............#.........#
 #################################################################################`;
-console.log(solve(test), 4042);
+console.log(solve(test), 2014);
