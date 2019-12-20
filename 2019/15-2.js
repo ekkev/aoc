@@ -42,12 +42,12 @@ const setMap = ([x, y], status) => {
 const posSetId = ([x, y]) => `${x}:${y}`;
 const newPosition = (pos, move) => [pos[X] + MoveDiff[move][X], pos[Y] + MoveDiff[move][Y]];
 
-const prettyPicture = (image, valueToPixel = v => v) => {
+const prettyPicture = (image, valueToPixel = v => v, fillEmpty = Status.Blank) => {
     const numericSort = { Asc: (a,b) => a-b, Desc: (a,b) => b-a };
     const mapValues = map => Array.from(map.values());
     const mapKeys = map => Array.from(map.keys());
 
-    const fillCellIfEmpty = row => x => row.has(x) || row.set(x, Status.Blank)
+    const fillCellIfEmpty = row => x => row.has(x) || row.set(x, fillEmpty)
     const fillEmptyCells  = range => row => range.map(fillCellIfEmpty(row));
 
     const sortedKeys      = map => mapKeys(map).sort(numericSort.Asc);
