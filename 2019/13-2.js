@@ -32,6 +32,7 @@ const Intcpu = (programCode, id = 'cpu') => {
         [OpCode.Exit]: () => ({ end: true }),
     };
 
+    let paused = false;
     let pos = 0;
     let relativeBase = 0;
     let memory = programCode.split(',').map(s => parseInt(s, 10));
@@ -60,7 +61,7 @@ const Intcpu = (programCode, id = 'cpu') => {
         if (typeof returnValue === 'function') {
             if (typeof userInputs === 'function') {
                 let userInput = userInputs();
-                console.log('IN', userInput);
+                // console.log('IN', userInput);
                 returnValue = returnValue(userInput);
             } else {
                 if (!userInputs.length) {
@@ -74,7 +75,8 @@ const Intcpu = (programCode, id = 'cpu') => {
     };
 
     const runUntilOutput = (userInputs) => {
-        while (pos in memory) {
+        paused = false;
+        while (pos in memory && !paused) {
             let { opcode, paramPos } = parseInstruction(memory, pos);
             let returnValue = runOpCode(opcode, paramPos, userInputs);
 
@@ -90,9 +92,13 @@ const Intcpu = (programCode, id = 'cpu') => {
                 return returnValue;
             }
         }
-        throw new Error(`Out of bounds ${pos}`);
+        if (paused) {
+            return { paused };
+        } else {
+            throw new Error(`Out of bounds ${pos}`);
+        }
     };
-    
+
     const runWithIO = (outputFn, inputFn = () => { throw new Error('User input needed') }) => {
         let ret;
         do {
@@ -104,9 +110,13 @@ const Intcpu = (programCode, id = 'cpu') => {
             }
         } while (!ret.end);
     }
+
+    const pause = () => paused = true;
+
     return {
         runUntilOutput,
         runWithIO,
+        pause,
     }
 };
 
@@ -141,7 +151,7 @@ const solve = programCode => {
     const map = [];
     let score = 0;
     const tilex = {};
-    
+
     const handleMove = (x, y, id) => {
         if (x === -1) {
             score = id;
