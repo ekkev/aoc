@@ -2,7 +2,7 @@ const { Intcpu } = require('./13-2')
 
 // Random walk through the maze, picking and dropping until working combination is found
 const solve = program => {
-    const cpu = Intcpu(program);
+    let cpu = Intcpu(program);
 
     let stack = '';
     const outputHandler = asc => {
@@ -10,17 +10,15 @@ const solve = program => {
         stack += chr;
     }
 
-    let log = false;
-    let response = [];
+    let log = true;
+    let response = [], lastTook;
     const directions = ['north', 'south', 'east', 'west'];
     const random = to => Math.floor(Math.random() * 100 % to);
     const randomDirection = () => directions[random(4)];
     const asCommand = str =>  [...str.split(''), '\n'];
 
-    // Manually added things that crashed the program or were too heavy by themselves
-    const dontTake = new Set(['giant electromagnet', 'photons', 'molten lava', 'infinite loop', 'escape pod',
-                            'hologram', 'manifold']);
-
+    // Manually added things that freeze the program -- no freeze detection
+    const dontTake = new Set(['infinite loop', 'giant electromagnet']);
     let inventory = '';
     const inputHandler = () => {
         if (stack) {
@@ -34,8 +32,10 @@ const solve = program => {
                 } else if (stack.match(/lighter/)) {
                     let drop = inv[random(inv.length)];
                     console.log('TOO MUCH:', inv, ' - dropping ', drop);
-                    if (inv.length === 1)
-                        throw new Error(`Never pick ${inv[0]}`)
+                    if (inv.length === 1) {
+                        dontTake.add(inv[0]);
+                        console.log(`Never pick ${inv[0]}`)
+                    }
 
                     response.push(...asCommand(`drop ${drop}`));
                 } else {
@@ -47,8 +47,12 @@ const solve = program => {
 
             if (stack.match(/Items here:\n- (.*)/) && Math.random() > 0.99) {
                 let item = stack.match(/Items here:\n- (.*)/)[1];
-                if (!dontTake.has(item))
+                if (!dontTake.has(item)) {
+                    if (item === 'infinite loop')
+                        log = true;
                     response.push(...asCommand(`take ${item}`));
+                    lastTook = item;
+                }
             }
 
             if (stack.match(/Security Checkpoint/))
@@ -62,12 +66,25 @@ const solve = program => {
 
             stack = '';
         }
-        // console.log(response.join(''));
+
         return response.shift().charCodeAt();
     }
 
-    let res = cpu.runWithIO(outputHandler, inputHandler);
-    console.log(res, stack);
+    while (1) {
+        const res = cpu.runWithIO(outputHandler, inputHandler);
+        console.log('DEAD');
+        const took = stack.match(/You take the (.*)./);
+        if (took) {
+            console.log('Died when taking ', took[1], stack);
+            dontTake.add(took[1]);
+            response = [];
+            cpu = Intcpu(program); // restart
+            log = false;
+        } else {
+            console.log(res, stack);
+            return;
+        }
+    }
 }
 
 
