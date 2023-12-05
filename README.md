@@ -1,3 +1,3 @@
 # aoc
 
-Here live some believably ugly JS solutions for advent of code.
+Here live some believably ugly JS/TS solutions for advent of code.
