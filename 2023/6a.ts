@@ -1,3 +1,4 @@
+import { product } from "./lib/array.ts";
 import { fileAsLines } from "./lib/file.ts";
 import { ints } from "./lib/string.ts";
 
@@ -36,5 +37,5 @@ for (const race of times.keys()) {
     // }
 }
 
-console.log({results, res: results.reduce((p, v)=>p*v, 1)})
+console.log({results, res: product(results)})
 // { results: [ 42, 54, 12, 23 ], res: 625968 }

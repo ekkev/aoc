@@ -1,3 +1,4 @@
+import { product } from "./lib/array.ts";
 import { fileAsLines } from "./lib/file.ts";
 import { ints } from "./lib/string.ts";
 
@@ -47,7 +48,7 @@ for (const race of times.keys()) {
 
     // Original submission brute force:
     // for (let speed = 1; speed < time; speed++) {
-    //     if (0 == speed%MILLION)
+    //     if (0 == speed%1_000_000)
     //         console.log(speed);
     //     const rem = time - speed;
     //     if (rem * speed > target)
@@ -55,5 +56,5 @@ for (const race of times.keys()) {
     // }
 }
 
-console.log({results, res: results.reduce((p, v)=>p*v, 1)})
+console.log({results, res: product(results)})
 // { results: [ 43663323 ], res: 43663323 }
