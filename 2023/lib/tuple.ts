@@ -19,6 +19,11 @@ export const tupleGroupByKey = <K, V>(tuples: [K, V][]): [string, V[]][] => {
     return [...res.entries()];
 }
 
+
+export const tupleSortByKey = <V>(tuples: [string, V][]) => tuples.sort((a, b) => a[0].localeCompare(b[0]))
+
+export const zip = <K, V>(arr1: K[], arr2: V[]) => arr1.map((k, i) => [k, arr2[i]]);
+
 const sanitizeKey = (key: any) => {
     if (Array.isArray(key)) {
         return key.join(',');

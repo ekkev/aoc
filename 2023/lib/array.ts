@@ -1,3 +1,5 @@
+import { zip } from "./tuple.ts";
+
 export const arrayOfValue = <T>(length: number, value: T): T[] => Array.from({ length }, () => value);
 
 export const sum = <T>(arr: T[]) => arr.reduce((p, v) => p + Number(v), 0);
@@ -35,3 +37,25 @@ export function* chunk<T>(arr: T[], n: number): Generator<T[], void> {
         yield arr.slice(i, i + n);
     }
 }
+
+export const translateMap = (from: string, to: string): Record<string, string> =>
+    Object.fromEntries(zip(from.split(''), to.split('')));
+
+export const translator = <A extends string|number|symbol, B>(map: Record<A, B>) => (el: A): B => map[el];
+
+export const countElementsInGroups = (arr: (string|number)[]): Record<string|number, number> => {
+    const countMap: Record<string|number, number> = {};
+    for (const e of arr) {
+        countMap[e] = 1 + (countMap[e]??0);
+    }
+    return countMap;
+}
+
+
+// Sort helpers
+
+export const numericDesc = (a: number, b: number) => b - a;
+export const numericAsc = (a: number, b: number) => a - b;
+
+export const sortPick = (map: (x: unknown) => string|number, fun: (a: string|number, b: string|number) => number) =>
+    (a: unknown, b: unknown) => fun(map(a), map(b));

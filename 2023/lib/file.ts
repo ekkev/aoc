@@ -4,6 +4,7 @@ import * as readline from 'node:readline';
 
 export const readAllLines = (filename: string) => fs.readFileSync(filename, 'ascii').split(/\n/);
 export const fileAsLines = (filename: string) => fs.readFileSync(filename, 'ascii').split(/\n/);
+export const fileAsTuples = (filename: string) => fileAsLines(filename).map(l => l.split(/ +/));
 export const fileAsNumbers = (filename: string) => fileAsLines(filename).map(row => [...row.matchAll(/\d+/g)].map(({0: num}) => Number(num)));
 
 export const fileAsMatchGroups = (filename: string, re: RegExp): Record<string, string>[] => {
