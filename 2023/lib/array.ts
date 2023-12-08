@@ -1,4 +1,22 @@
-import { zip } from "./tuple.ts";
+import { tupleSortByKey, tupleValues, zip } from "./tuple.ts";
+
+declare global {
+
+    interface Array<T> {
+        sum(): number,
+        product(): number,
+        tupleSortByKey(): T[],
+        tupleValues <V>(): V[];
+    }
+}
+
+export const protosArray = () => {
+    Array.prototype.sum = function s <T>() { return sum(this) }
+    Array.prototype.product = function s <T>() { return product(this) }
+    Array.prototype.tupleSortByKey = function s <T>() { return tupleSortByKey(this) };
+    Array.prototype.tupleValues = function s <V>(): V[] { return tupleValues(this) };
+}
+
 
 export const arrayOfValue = <T>(length: number, value: T): T[] => Array.from({ length }, () => value);
 
@@ -41,9 +59,12 @@ export function* chunk<T>(arr: T[], n: number): Generator<T[], void> {
 export const translateMap = (from: string, to: string): Record<string, string> =>
     Object.fromEntries(zip(from.split(''), to.split('')));
 
-export const translator = <A extends string|number|symbol, B>(map: Record<A, B>) => (el: A): B => map[el];
+export const translator = <A extends string|number|symbol, B>(map: Record<A, B>) => (el: A): B => map[el] ?? el as unknown as B;
 
-export const countElementsInGroups = (arr: (string|number)[]): Record<string|number, number> => {
+export const countElementsInGroups = (arr: (string|number)[] | string): Record<string|number, number> => {
+    if (typeof arr === 'string') {
+        arr = arr.split('');
+    }
     const countMap: Record<string|number, number> = {};
     for (const e of arr) {
         countMap[e] = 1 + (countMap[e]??0);

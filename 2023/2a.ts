@@ -14,7 +14,6 @@ for (const [idx, line] of lines.entries()) {
         .map(([num, col]) => [Number(num), col]) as [number, keyof typeof have][];
 
     const possible = colors.every(([v,k]) => have[k] >= v);
-    console.log(colors, possible)
     if (possible) {
         result += idx+1;
     }

@@ -5,7 +5,7 @@ const matrix = matrixFromFile('3.in');
 const isSymbol = (v: string) => v !== '.' && isNaN(Number(v))
 
 const allNumbers = matrixFindHorizontalPatterns(matrix, {
-    regex: /\d+/g
+    regex: /\d+/
 });
 
 const numbersWithSymbols = allNumbers.map(([[x, y], num]) =>  

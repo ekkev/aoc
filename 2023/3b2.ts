@@ -4,7 +4,7 @@ import { tupleGroupByKey, tupleValues } from "./lib/tuple.ts";
 
 const matrix = matrixFromFile('3.in');
 const allNumbers = matrixFindHorizontalPatterns(matrix, {
-    regex: /\d+/g
+    regex: /\d+/
 });
 
 const gearToNumberTuples = allNumbers

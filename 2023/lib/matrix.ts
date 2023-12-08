@@ -40,13 +40,14 @@ export const matrixFindElements = (matrix: M, opts: {
 };
 
 export const matrixFindHorizontalPatterns = <T = string>(matrix: M, opts: {
-    regex: RegExp,
+    regex: RegExp | string,
     map?: (v: string, xy: XY) => T
 }): [XY, T][] => {
     const res: [XY, T][] = [];
+    const re = new RegExp(opts.regex, 'g');
 
     for (const [y, line] of matrix.entries()) {
-        const matches = line.join('').matchAll(opts.regex);
+        const matches = line.join('').matchAll(re);
         for (const m of matches) {
             const x = m.index!;
             const v = opts.map ? opts.map(m[0], [x, y]) : m[0];
