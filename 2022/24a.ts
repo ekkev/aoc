@@ -21,24 +21,6 @@ const avoidswind = (minute: number) => ([x, y]: XY) =>
     || mapget([x, y + minute]) === '^'
     || mapget([x, y - minute]) === 'v');
 
-type QI = {
-    pos: XY,
-    minute: number,
-    cost: number,
-}
-let seen: Set<string> = new Set();
-let q: QI[] = [{ pos: [0, -1], minute: 0, cost: 0 }];
-
-const addToPriorityQueue = (qi: QI) => {
-    const key = `${qi.pos.join(',')}_${qi.minute}`;
-    if (seen.has(key)) {
-        return;
-    }
-    seen.add(key);
-    const pos = q.findIndex(item => item.cost > qi.cost);
-    q.splice(pos === -1 ? q.length : pos, 0, qi);
-}
-
 const solve = (start: XY, end: XY) => {
     let minute = 0;
     let posq: XY[] = [start];
@@ -60,18 +42,4 @@ const solve = (start: XY, end: XY) => {
 }
 
 console.log(solve([0, -1], [targetX, targetY + 1]));
-
-
-// do {
-//     const { pos, minute } = q.shift()!!;
-//     if (pos[0] === targetX && pos[1] === targetY) {
-//         console.log(minute + 1);
-//         break;
-//     }
-
-//     allmoves(pos).filter(avoidswind(minute + 1)).forEach(move => {
-//         addToPriorityQueue({ pos: move, minute: minute + 1, cost: minute + 10000-(targetX - move[0])+(targetY - move[1]) });
-//     });
-// } while (q.length);
-
-// 290
+// 308

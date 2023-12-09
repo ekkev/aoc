@@ -1,6 +1,6 @@
-import { time } from "console";
-import { lineByLine } from "./file";
-import { range } from "./lib/array";
+import { lineByLine } from "./file.ts";
+import { sum } from "./lib/array.ts";
+import { findPathsFlexi } from "./lib/path.ts";
 
 async function solve() {
 
@@ -33,109 +33,60 @@ async function solve() {
 
     const distances: Map<string, number> = new Map;
     const distanceBetween = (from: string, to: string) => {
-        if (distances.has(key(from, to))) {
-            return distances.get(key(from, to));
-        }
-
-        type QI = { node: string, cost: number };
-        const queue: QI[] = [{ node: from, cost: 0 }];
-        const addToPriorityQueue = (qi: QI) => {
-            const pos = queue.findIndex(item => item.cost > qi.cost);
-            queue.splice(pos === -1 ? queue.length : pos, 0, qi);
-        }
-
-        let el: QI | undefined;
-
-        let visited: string[] = [];
-
-        while (el = queue.shift()) {
-            visited.push(el.node);
-
-            if (el.node === to) {
-                // console.log('Distance', from, to, el.cost);
-                distances.set(key(from, to), el.cost);
-                return el.cost;
-            }
-
-            for (const target of nodes[el.node].targets) {
-                if (visited.includes(target)) {
-                    continue;
-                }
-                addToPriorityQueue({ node: target, cost: el.cost + 1})
-            }
-        }
+        const res = findPathsFlexi<string>({
+            startNodes: [from],
+            endCondition: el => el === to,
+            nextMovesFn: el => nodes[el].targets,
+            cacheKeyFn: el => el,
+        }).next();
+        distances.set(key(from, to), res.value.finalCost);
     }
 
     // Map distances between valves with flow rate
-    const valveDistances: [string, string, number][] = []; // valve nodes
     const valveNodes = Object.values(nodes).filter(v => v.rate).sort((a, b) => b.rate-a.rate);
+    valveNodes.forEach((outer, index) => {
+        distanceBetween(outer.name, 'AA')
+        valveNodes.filter((_, innerIndex) => innerIndex > index).forEach(inner => {
+            distanceBetween(outer.name, inner.name);
+        })
+    });
 
-    valveNodes.forEach((outer, index) => distanceBetween(outer.name, 'AA') && valveNodes.filter((_, innerIndex) => innerIndex > index).forEach(inner => {
-        distanceBetween(outer.name, inner.name);
-    }));
+    type QI = { node: string,  timeremaining: number, closed: ValveNode[], cumulativerate: number };
+    let bestFound: QI|undefined = undefined;
 
+    const itFinder = findPathsFlexi<QI>({
+        startNodes: [{ node: 'AA', timeremaining: 30, closed: valveNodes.filter(v => v.name !== 'AA'), cumulativerate: 0 }],
+        endCondition: (el) => el.timeremaining <= 0 || el.closed.length === 0,
+        nextMovesFn: (el) => el.closed.map(target => {
+            const timeremaining = el.timeremaining - 1 - (distances.get(key(el.node, target.name))!);
+            const cumulativerate = el.cumulativerate + Math.max(0,  target.rate * timeremaining);
+            const closed = el.closed.filter(v => v.name !== target.name);
+            const bestCaseRate = cumulativerate +
+                                sum(closed.map((v, index) => Math.max(0, v.rate * (timeremaining - 2 * (index + 1)))));
 
-    // optimal path between valveNodes with cost function of..
-    console.log(valveNodes.filter(v=>v).reduce((sum, v, index) => sum + v.rate * (30 - 2 * (index + 1)), 0))
-
-    type QI = { node: string, cost: number, timeremaining: number, opened: string[], cumulativerate: number };
-    const queue: QI[] = [{ node: 'AA', cost: 0, timeremaining: 30, opened: [], cumulativerate: 0 }];
-    const addToPriorityQueue = (qi: QI) => {
-        const pos = queue.findIndex(item => item.cost > qi.cost);
-        queue.splice(pos === -1 ? queue.length : pos, 0, qi);
-    }
-
-    let el: QI | undefined;
-    let foundPaths: QI[] = [];
-    let bestFound: QI|undefined;
-
-    let visited: string[] = [];
-    while (el = queue.shift()) {
-        visited.push(el.node);
-
-        if (el.timeremaining <= 0 || el.opened.length === valveNodes.length) {
-            // console.log('End of path', el);
-            if (!bestFound) { 
-                bestFound = el;
-            } else if (bestFound.cumulativerate < el.cumulativerate) {
-                bestFound = el;
-            }
-            // console.log(el);
-            // foundPaths.push(el);
-            continue; // keep finding other paths
-        }
-
-        for (const target of valveNodes) {
-            if (el.opened.includes(target.name)) {
-                continue;
+            if (bestFound && bestCaseRate <= bestFound.cumulativerate) {
+                return;
             }
 
-            const timeremaining = ((el.timeremaining - 1 - (distances.get(key(el.node, target.name))??Infinity)));
-            const additionalrate = target.rate * timeremaining;
-            const cumulativerate = el.cumulativerate + Math.max(0, additionalrate);
-            const opened = [...el.opened, target.name];
-            const bestCaseRate = cumulativerate + additionalrate +
-                                valveNodes.filter(n => !opened.includes(n.name))
-                                          .reduce((sum, v, index) => sum + v.rate * (timeremaining - 2 * (index + 1)), 0);
-            if (bestFound && bestCaseRate < bestFound.cumulativerate) {
-                continue;
-            }
-
-            addToPriorityQueue({
+            return {
                 node: target.name, 
-                cost: -bestCaseRate, 
-                opened, 
+                closed,
                 timeremaining,
                 cumulativerate,
-             })
-        }
+            }
+        }).filter(v => v !== undefined) as QI[],
+        costFn: el => -el.cumulativerate, // Look at highest cumulative rate first, tiny speedup
+    })
+
+    for (const el of itFinder) {
+        if (!bestFound) { 
+            bestFound = el.finalElement;
+        } else if (bestFound.cumulativerate < el.finalElement.cumulativerate) {
+            bestFound = el.finalElement;
+        }        
     }
 
-    // const max = Math.max.apply(null, foundPaths.map(p => p.cumulativerate))
-    // const res = foundPaths.find(p => p.cumulativerate === max)
-    // console.log(res, max)
-    // console.log(foundPaths.length);
-    console.log(bestFound);
+    console.log({bestFound, res: bestFound?.cumulativerate});
 }
 
-solve(); // 1673
+solve(); // 1741
