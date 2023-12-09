@@ -16,4 +16,10 @@ deno 5a.ts: 0.024s wall; 0.014s userspace
 deno 5b.ts: 0.037s wall; 0.029s userspace
 deno 6a.ts: 0.027s wall; 0.013s userspace
 deno 6b.ts: 0.023s wall; 0.013s userspace
+deno 7a.ts: 0.053s wall; 0.046s userspace
+deno 7b.ts: 0.064s wall; 0.060s userspace
+deno 8a.ts: 0.029s wall; 0.019s userspace
+deno 8b.ts: 0.032s wall; 0.022s userspace
+deno 9a.ts: 0.028s wall; 0.019s userspace
+deno 9b.ts: 0.025s wall; 0.018s userspace
 ```
