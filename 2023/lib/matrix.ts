@@ -5,14 +5,23 @@ export type M = string[][];
 export type XY = [number, number];
 export type BBox = [XY, XY];
 
+export const matrixUp = ([x, y]: XY = [0, 0]): XY => [x, y-1];
+export const matrixDown = ([x, y]: XY = [0, 0]): XY => [x, y+1];
+export const matrixLeft = ([x, y]: XY = [0, 0]): XY => [x-1, y];
+export const matrixRight = ([x, y]: XY = [0, 0]): XY => [x+1, y];
+
+export const xydirections = (pos: XY = [0,0]): [XY, XY, XY, XY] => [matrixUp(pos), matrixDown(pos), matrixLeft(pos), matrixRight(pos)];
+
 export const xykey = ([x, y]: XY) => `${x},${y}`;
+export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
 export const matrixFromLines = (lines: string[]): M => lines.map(line => line.split(''));
 export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(file));
-export const matrixGet = (matrix: M, [x, y]: XY): string | undefined => matrix[y] ? matrix[y][x] : undefined;
+export const matrixGet = <T = string>(matrix: M, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
 export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
 export const matrixCols = (matrix: M, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
 export const matrixSlice = (matrix: M, [[x1, y1], [x2, y2]]: BBox) => matrixCols(matrixRows(matrix, y1, y2), x1, x2);
+export const matrixClone = (matrix: M): M => [...matrix.map(line => [...line])];
 export const matrixPrint = (matrix: M, opts: { bbox?: BBox, replacer?: (v: string) => string } = {}) => 
     (opts.bbox ? matrixSlice(matrix, opts.bbox) : matrix)
     .forEach(line => console.log(line.map(opts.replacer ?? (v => v)).join('')));
