@@ -59,3 +59,5 @@ export const tupleReduceInGroups = <K extends TupleKey, V, RV>(tuples: [K, V][],
 
 export const tupleKeys = <K extends TupleKey, V>(tuples: [K, V][]): K[] => tuples.map(([k, _]) => k);
 export const tupleValues = <K extends TupleKey, V>(tuples: [K, V][]): V[] => tuples.map(([_, v]) => v);
+
+export const tupleObj = Object.fromEntries;

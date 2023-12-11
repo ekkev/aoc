@@ -1,3 +1,7 @@
+
+export const betweenExcluding = (v: number, a: number, b: number) => v > Math.min(a, b) && v < Math.max(a, b);
+
+
 /**
  * Suurim ühistegur = greatest common divisor
  */

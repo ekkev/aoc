@@ -68,11 +68,11 @@ export const matrixFindHorizontalPatterns = <T = string>(matrix: M, opts: {
 }
 
 export const rotateMatrix = (matrix: M): M => {
-    const n = matrix.length;
-    const rotatedMatrix = Array.from({length: matrix[0].length}, () => new Array(n));
-    for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-            rotatedMatrix[j][n - 1 - i] = matrix[i][j];
+
+    const rotatedMatrix = Array.from({length: matrix[0].length}, () => new Array(matrix.length));
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[0].length; j++) {
+            rotatedMatrix[j][matrix.length - 1 - i] = matrix[i][j];
         }
     }
 
@@ -86,7 +86,6 @@ export const matrixFindVerticalPatterns = <T = string>(matrix: M, opts: {
     const res: [XY, T][] = [];
 
     for (const [x, line] of rotateMatrix(matrix).entries()) {
-        console.log(line.join(''));
         const matches = line.join('').matchAll(opts.regex);
         for (const m of matches) {
             const y = m.index!;
