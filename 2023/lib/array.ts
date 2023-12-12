@@ -29,6 +29,9 @@ export const intersect = <T>(a: T[], b: T[]): T[] => a.filter(v => b.includes(v)
 export const rangeInclusive = (from: number, to: number): number[] => from > to ? [] :
     Array.from( { length: 1+to-from }, (_, index) => from + index)
 
+export const rangeExclusive = (from: number, to: number): number[] => from > to ? [] :
+    Array.from( { length: to-from }, (_, index) => from + index)
+
 // ascending or descending
 export const rangeAnyOrder = (from: number, to: number): number[] => from > to ? rangeInclusive(to, from).reverse() :
     Array.from( { length: 1+to-from }, (_, index) => from + index)
