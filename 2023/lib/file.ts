@@ -2,6 +2,7 @@ import * as fs from 'node:fs';
 import * as readline from 'node:readline';
 
 
+export const fileAsString = (filename: string) => fs.readFileSync(filename, 'ascii');
 export const readAllLines = (filename: string) => fs.readFileSync(filename, 'ascii').split(/\n/);
 export const fileAsLines = (filename: string) => fs.readFileSync(filename, 'ascii').split(/\n/);
 export const fileAsTuples = (filename: string) => fileAsLines(filename).map(l => l.split(/ +/));

@@ -15,6 +15,7 @@ export const xydirections = (pos: XY = [0,0]): [XY, XY, XY, XY] => [matrixUp(pos
 export const xykey = ([x, y]: XY) => `${x},${y}`;
 export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
 export const matrixFromLines = (lines: string[]): M => lines.map(line => line.split(''));
+export const matrixFromString = (lines: string): M => lines.split(/\n/).map(line => line.split(''));
 export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(file));
 export const matrixGet = <T = string>(matrix: M, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
@@ -22,6 +23,10 @@ export const matrixRows = (matrix: M, start: number, end: number) => [...matrix]
 export const matrixCols = (matrix: M, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
 export const matrixSlice = (matrix: M, [[x1, y1], [x2, y2]]: BBox) => matrixCols(matrixRows(matrix, y1, y2), x1, x2);
 export const matrixClone = (matrix: M): M => [...matrix.map(line => [...line])];
+
+export const matrixEquals = (a: M, b: M) => a.length === b.length && matrixToString(a) === matrixToString(b);
+
+export const matrixToString = (matrix: M): string => matrix.map(line => line.join('')).join('\n');
 export const matrixPrint = (matrix: M, opts: { bbox?: BBox, replacer?: (v: string) => string } = {}) => 
     (opts.bbox ? matrixSlice(matrix, opts.bbox) : matrix)
     .forEach(line => console.log(line.map(opts.replacer ?? (v => v)).join('')));
@@ -67,6 +72,12 @@ export const matrixFindHorizontalPatterns = <T = string>(matrix: M, opts: {
     return res;
 }
 
+/**
+ * Rotates matrix 90 degress clockwise / to-the-right
+ * Nice property: earlier #rows from start ==> #columns from start
+ * @param matrix 
+ * @returns 
+ */
 export const rotateMatrix = (matrix: M): M => {
 
     const rotatedMatrix = Array.from({length: matrix[0].length}, () => new Array(matrix.length));
