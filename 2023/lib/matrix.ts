@@ -90,13 +90,31 @@ export const rotateMatrix = (matrix: M): M => {
     return rotatedMatrix;
 }
 
+/**
+ * Transpose - flip over diagonal. Swap rows and columns.
+ * @param matrix 
+ * @returns Matrix
+ */
+export const transposeMatrix = (matrix: M): M => {
+
+    const rotatedMatrix = Array.from({length: matrix[0].length}, () => new Array(matrix.length));
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[0].length; j++) {
+            rotatedMatrix[j][i] = matrix[i][j];
+        }
+    }
+
+    return rotatedMatrix;
+}
+
+
 export const matrixFindVerticalPatterns = <T = string>(matrix: M, opts: {
     regex: RegExp,
     map?: (v: string, xy: XY) => T
 }): [XY, T][] => {
     const res: [XY, T][] = [];
 
-    for (const [x, line] of rotateMatrix(matrix).entries()) {
+    for (const [x, line] of transposeMatrix(matrix).entries()) {
         const matches = line.join('').matchAll(opts.regex);
         for (const m of matches) {
             const y = m.index!;
