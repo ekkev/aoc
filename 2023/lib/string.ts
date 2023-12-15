@@ -19,9 +19,18 @@ declare global {
 
     interface String {
         count(el: string|RegExp): number,
+        map<T>(cb: (character: string, index: number) => T): T[],
+        log(prefix?: string): this,
     }
 }
 
 export const protosString = () => {
     String.prototype.count = function c(re: RegExp|string) { return countInString(this as string, re) };
+    String.prototype.map = function map<T>(cb: (character: string, index: number) => T): T[] {
+        return (this as string).split('').map(cb);
+    }
+    String.prototype.log = function log(prefix = '') {
+        console.log(prefix, this);
+        return this;
+    }
 }
