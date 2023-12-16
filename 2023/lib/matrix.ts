@@ -4,6 +4,7 @@ import { readAllLines } from "./file.ts";
 export type M = string[][];
 export type XY = [number, number];
 export type BBox = [XY, XY];
+export type DirStr = 'r' | 'l' | 'u' | 'd';
 
 export const matrixUp = ([x, y]: XY = [0, 0]): XY => [x, y-1];
 export const matrixDown = ([x, y]: XY = [0, 0]): XY => [x, y+1];
@@ -11,6 +12,26 @@ export const matrixLeft = ([x, y]: XY = [0, 0]): XY => [x-1, y];
 export const matrixRight = ([x, y]: XY = [0, 0]): XY => [x+1, y];
 
 export const xydirections = (pos: XY = [0,0]): [XY, XY, XY, XY] => [matrixUp(pos), matrixDown(pos), matrixLeft(pos), matrixRight(pos)];
+export const xymove = (pos: XY, dir: DirStr | string) => {
+    switch (dir) {
+        case "r": return matrixRight(pos);
+        case "l": return matrixLeft(pos);
+        case "u": return matrixUp(pos);
+        case "d": return matrixDown(pos);
+    }
+    throw new Error(`Unknown direction ${dir}`);
+}
+
+export const xydirturn = (dir: DirStr, turn: 'l'|'r'): DirStr => ({
+        'rr': 'd',
+        'rl': 'u',
+        'lr': 'u',
+        'll': 'd',
+        'ur': 'r',
+        'ul': 'l',
+        'dr': 'l',
+        'dl': 'r',
+    })[[dir, turn].join('')] as DirStr;
 
 export const xykey = ([x, y]: XY) => `${x},${y}`;
 export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
@@ -20,7 +41,13 @@ export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(fil
 export const matrixGet = <T = string>(matrix: M, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
 export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
+export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((row, y) => cb(y));
+export const matrixForEachCol = (matrix: M, cb: (x: number) => unknown) => matrix[0].forEach((el, x) => cb(x));
+
 export const matrixCols = (matrix: M, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
+
+export const matrixMaxX = (matrix: M) => matrix[0].length - 1;
+export const matrixMaxY = (matrix: M) => matrix.length - 1;
 export const matrixSlice = (matrix: M, [[x1, y1], [x2, y2]]: BBox) => matrixCols(matrixRows(matrix, y1, y2), x1, x2);
 export const matrixClone = (matrix: M): M => [...matrix.map(line => [...line])];
 
@@ -127,3 +154,4 @@ export const matrixFindVerticalPatterns = <T = string>(matrix: M, opts: {
 }
 
 export const inBbox = (pos: XY, a: XY, b: XY) =>  inRange(pos[0], a[0], b[0]) && inRange(pos[1], a[1], b[1])
+export const inMatrix = (matrix: M, [x, y]: XY) => x < matrix[0].length && x >= 0 && y >= 0 && y < matrix.length;
