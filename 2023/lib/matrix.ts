@@ -1,7 +1,7 @@
 import { inRange } from "./array.ts";
 import { readAllLines } from "./file.ts";
 
-export type M = string[][];
+export type M<T = string> = T[][];
 export type XY = [number, number];
 export type BBox = [XY, XY];
 export type DirStr = 'r' | 'l' | 'u' | 'd';
@@ -38,7 +38,7 @@ export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
 export const matrixFromLines = (lines: string[]): M => lines.map(line => line.split(''));
 export const matrixFromString = (lines: string): M => lines.split(/\n/).map(line => line.split(''));
 export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(file));
-export const matrixGet = <T = string>(matrix: M, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
+export const matrixGet = <T = string>(matrix: M<T>, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
 export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
 export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((row, y) => cb(y));

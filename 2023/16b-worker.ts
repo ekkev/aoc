@@ -1,3 +1,5 @@
+/// <reference lib="deno.worker" />
+
 import { DirStr, M, XY, inMatrix, matrixFromFile, matrixGet, xydirturn, xymove } from "./lib/matrix.ts";
 import { findPathsFlexi } from "./lib/path.ts";
 

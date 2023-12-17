@@ -51,7 +51,7 @@ export function *findPathsFlexi<T>(opts: {
     cacheKeyFn?: (el: T) => string|undefined,
     isValidMoveFn?: (to: T, from: T) => boolean,
     costFn?: (node: T, prevCost: number) => number,
-    beforeMoveFn?: (el: T) => void;
+    beforeMoveFn?: (el: T, cost: number) => void;
 }
 ): Generator<{ finalElement: T, finalCost: number, history: Map<T, T> }> {
 
@@ -68,21 +68,21 @@ export function *findPathsFlexi<T>(opts: {
     const {startNodes, nextMovesFn, cacheKeyFn, isValidMoveFn, costFn} = opts;
 
     const q = new PriorityQueue<T>(startNodes);
-    const history: Map<T, T> = new Map();
+    // const history: Map<T, T> = new Map();
     const visited: Set<string | undefined> = new Set(startNodes.map(cacheKeyFn));
 
     while (!q.isEmpty()) {
         const [current, cost] = q.dequeueWithCost();
 
         if (opts.beforeMoveFn) {
-            opts.beforeMoveFn(current);
+            opts.beforeMoveFn(current, cost);
         }
 
         if (opts.endCondition && opts.endCondition(current)) {
             yield {
                 finalElement: current,
                 finalCost: cost,
-                history: new Map,
+                history: new Map(),
             };
             continue;
         }
