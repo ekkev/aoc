@@ -38,11 +38,12 @@ export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
 export const matrixFromLines = (lines: string[]): M => lines.map(line => line.split(''));
 export const matrixFromString = (lines: string): M => lines.split(/\n/).map(line => line.split(''));
 export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(file));
+export const matrixCreate = (width: number, height: number, gen = () => '.') =>  Array.from({length: height}, () => Array.from({length: width}, gen))
 export const matrixGet = <T = string>(matrix: M<T>, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
 export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
-export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((row, y) => cb(y));
-export const matrixForEachCol = (matrix: M, cb: (x: number) => unknown) => matrix[0].forEach((el, x) => cb(x));
+export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((_row, y) => cb(y));
+export const matrixForEachCol = (matrix: M, cb: (x: number) => unknown) => matrix[0].forEach((_el, x) => cb(x));
 
 export const matrixCols = (matrix: M, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
 
@@ -58,8 +59,11 @@ export const matrixPrint = (matrix: M, opts: { bbox?: BBox, replacer?: (v: strin
     (opts.bbox ? matrixSlice(matrix, opts.bbox) : matrix)
     .forEach(line => console.log(line.map(opts.replacer ?? (v => v)).join('')));
 
-export const matrixFindElements = (matrix: M, opts: {
+export const matrixFindElements = (matrix: M, opts: ({
+    value: string }
+| {
     predicate: (v: string, xy: XY) => boolean,
+}) & {
     map?: (v: string, xy: XY) => string,
     bbox?: BBox
 }): [XY, string][] => {
@@ -72,7 +76,7 @@ export const matrixFindElements = (matrix: M, opts: {
     }
     m.forEach((row, y) => {
         row.forEach((v, x) => {
-            if (opts.predicate(v, [x, y])) {
+            if (('value' in opts && v === opts.value) || ('predicate' in opts && opts.predicate(v, [x, y]))) {
                 res.push([[offsetX+x, offsetY+y], opts.map ? opts.map(v, [x, y]) : v])
             }
         })
