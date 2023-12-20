@@ -38,4 +38,12 @@ deno 15b2.ts: 0.029s wall; 0.024s userspace
 deno 16a.ts: 0.040s wall; 0.049s userspace
 deno 16b.ts: 1.711s wall; 1.861s userspace
 deno 16b-multithread.ts: 0.572s wall; 3.996s userspace
+deno 17a.ts: 0.645s wall; 0.655s userspace
+deno 17b.ts: 3.926s wall; 3.967s userspace
+deno 18a.ts: 0.097s wall; 0.110s userspace
+deno 18b.ts: 0.024s wall; 0.014s userspace
+deno 19a.ts: 0.029s wall; 0.020s userspace
+deno 19b.ts: 0.114s wall; 0.107s userspace
+deno 20a.ts: 0.033s wall; 0.031s userspace
+deno 20b.ts: 0.051s wall; 0.047s userspace
 ```
