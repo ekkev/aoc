@@ -46,9 +46,9 @@ export class PriorityQueue<T> {
 
 export function *findPathsFlexi<T>(opts: {
     startNodes: T[],
-    endCondition?: (el: T) => boolean,
+    endCondition?: (el: T, cost: number) => boolean,
     nextMovesFn: (el: T) => T[],
-    cacheKeyFn?: (el: T) => string|undefined,
+    cacheKeyFn?: (el: T, cost: number) => string|undefined,
     isValidMoveFn?: (to: T, from: T) => boolean,
     costFn?: (node: T, prevCost: number) => number,
     beforeMoveFn?: (el: T, cost: number) => void;
@@ -78,7 +78,7 @@ export function *findPathsFlexi<T>(opts: {
             opts.beforeMoveFn(current, cost);
         }
 
-        if (opts.endCondition && opts.endCondition(current)) {
+        if (opts.endCondition && opts.endCondition(current, cost)) {
             yield {
                 finalElement: current,
                 finalCost: cost,
@@ -89,7 +89,7 @@ export function *findPathsFlexi<T>(opts: {
 
         const nextMoves = nextMovesFn(current).filter(move => isValidMoveFn(move, current));
         for (const move of nextMoves) {
-            const key = cacheKeyFn(move);
+            const key = cacheKeyFn(move, cost);
 
             if (key === undefined || !visited.has(key)) {
                 visited.add(key);

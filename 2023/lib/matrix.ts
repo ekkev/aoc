@@ -11,7 +11,12 @@ export const matrixDown = ([x, y]: XY = [0, 0]): XY => [x, y+1];
 export const matrixLeft = ([x, y]: XY = [0, 0]): XY => [x-1, y];
 export const matrixRight = ([x, y]: XY = [0, 0]): XY => [x+1, y];
 
-export const xydirections = (pos: XY = [0,0]): [XY, XY, XY, XY] => [matrixUp(pos), matrixDown(pos), matrixLeft(pos), matrixRight(pos)];
+export const xydirections = (pos: XY = [0,0]): [XY, XY, XY, XY] => [
+    matrixUp(pos), 
+    matrixDown(pos), 
+    matrixLeft(pos), 
+    matrixRight(pos)
+];
 export const xymove = (pos: XY, dir: DirStr | string) => {
     switch (dir) {
         case "r": return matrixRight(pos);
