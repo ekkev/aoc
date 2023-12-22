@@ -3,6 +3,7 @@ import { readAllLines } from "./file.ts";
 
 export type M<T = string> = T[][];
 export type XY = [number, number];
+export type XYZ = [number, number, number];
 export type BBox = [XY, XY];
 export type DirStr = 'r' | 'l' | 'u' | 'd';
 
@@ -45,7 +46,7 @@ export const matrixFromString = (lines: string): M => lines.split(/\n/).map(line
 export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(file));
 export const matrixCreate = (width: number, height: number, gen = () => '.') =>  Array.from({length: height}, () => Array.from({length: width}, gen))
 export const matrixGet = <T = string>(matrix: M<T>, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
-export const matrixSet = (matrix: M, [x, y]: XY, v: string) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
+export const matrixSet = <T = string>(matrix: M<T>, [x, y]: XY, v: T) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
 export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
 export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((_row, y) => cb(y));
 export const matrixForEachCol = (matrix: M, cb: (x: number) => unknown) => matrix[0].forEach((_el, x) => cb(x));
@@ -64,14 +65,14 @@ export const matrixPrint = (matrix: M, opts: { bbox?: BBox, replacer?: (v: strin
     (opts.bbox ? matrixSlice(matrix, opts.bbox) : matrix)
     .forEach(line => console.log(line.map(opts.replacer ?? (v => v)).join('')));
 
-export const matrixFindElements = (matrix: M, opts: ({
-    value: string }
+export const matrixFindElements = <T = string>(matrix: M<T>, opts: ({
+    value: T }
 | {
-    predicate: (v: string, xy: XY) => boolean,
+    predicate: (v: T, xy: XY) => boolean,
 }) & {
     map?: (v: string, xy: XY) => string,
     bbox?: BBox
-}): [XY, string][] => {
+}): [XY, T][] => {
     const res: [XY, string][] = [];
     let m = matrix, offsetX = 0, offsetY = 0;
     if (opts.bbox) {
