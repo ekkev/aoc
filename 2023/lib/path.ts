@@ -31,6 +31,15 @@ export class PriorityQueue<T> {
         return [qe.element, qe.priority];
     }
 
+    dequeueLastWithCost(): [T, number] {
+        if (this.isEmpty()) {
+            throw new Error("Queue is empty");
+        }
+        const qe = this.items.pop()!;
+        return [qe.element, qe.priority];
+    }
+
+
     isEmpty(): boolean {
         return this.items.length === 0;
     }
@@ -46,11 +55,12 @@ export class PriorityQueue<T> {
 
 export function *findPathsFlexi<T>(opts: {
     startNodes: T[],
+    prioritizeHighCost?: boolean,
     endCondition?: (el: T, cost: number) => boolean,
     nextMovesFn: (el: T) => T[],
     cacheKeyFn?: (el: T, cost: number) => string|undefined,
     isValidMoveFn?: (to: T, from: T) => boolean,
-    costFn?: (node: T, prevCost: number) => number,
+    costFn?: (node: T, prevCost: number, prevNode: T) => number,
     beforeMoveFn?: (el: T, cost: number) => void;
 }
 ): Generator<{ finalElement: T, finalCost: number, history: Map<T, T> }> {
@@ -65,6 +75,8 @@ export function *findPathsFlexi<T>(opts: {
         opts.costFn = (_, prevCost) => prevCost + 1;
     }
 
+    const highCostFirst = opts.prioritizeHighCost ?? false;
+
     const {startNodes, nextMovesFn, cacheKeyFn, isValidMoveFn, costFn} = opts;
 
     const q = new PriorityQueue<T>(startNodes);
@@ -72,7 +84,7 @@ export function *findPathsFlexi<T>(opts: {
     const visited: Set<string | undefined> = new Set(startNodes.map(cacheKeyFn));
 
     while (!q.isEmpty()) {
-        const [current, cost] = q.dequeueWithCost();
+        const [current, cost] = highCostFirst ? q.dequeueLastWithCost() : q.dequeueWithCost();
 
         if (opts.beforeMoveFn) {
             opts.beforeMoveFn(current, cost);
@@ -94,23 +106,10 @@ export function *findPathsFlexi<T>(opts: {
             if (key === undefined || !visited.has(key)) {
                 visited.add(key);
 
-                // history.set(move, current);
-                // if (!q.contains(move)) {
-                    q.enqueue(move, costFn(move, cost));
-                // }
+                q.enqueue(move, costFn(move, cost, current));
             }
         };
     }
 
     return []; // Return an empty path if no path is found
 }
-
-
-// function reconstructPath<T>(cameFrom: Map<INode<T>, INode<T>>, current: INode<T>): INode<T>[] {
-//     const totalPath = [current];
-//     while (cameFrom.has(current)) {
-//         current = cameFrom.get(current);
-//         totalPath.unshift(current);
-//     }
-//     return totalPath;
-// }

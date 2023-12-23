@@ -40,6 +40,7 @@ export const xydirturn = (dir: DirStr, turn: 'l'|'r'): DirStr => ({
     })[[dir, turn].join('')] as DirStr;
 
 export const xykey = ([x, y]: XY) => `${x},${y}`;
+export const xyequal = ([x1, y1]: XY, [x2, y2]: XY): boolean => x1 === x2 && y1 === y2;
 export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1+x2, y1+y2];
 export const matrixFromLines = (lines: string[]): M => lines.map(line => line.split(''));
 export const matrixFromString = (lines: string): M => lines.split(/\n/).map(line => line.split(''));
@@ -47,15 +48,15 @@ export const matrixFromFile = (file: string) => matrixFromLines(readAllLines(fil
 export const matrixCreate = (width: number, height: number, gen = () => '.') =>  Array.from({length: height}, () => Array.from({length: width}, gen))
 export const matrixGet = <T = string>(matrix: M<T>, [x, y]: XY): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = <T = string>(matrix: M<T>, [x, y]: XY, v: T) => { if (matrix[y]) { matrix[y][x] = v; return; } throw new Error(`No row ${y} in matrix`) };
-export const matrixRows = (matrix: M, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
+export const matrixRows = <T = string>(matrix: M<T>, start: number, end: number) => [...matrix].slice(Math.max(0, start), end + 1);
 export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) => matrix.forEach((_row, y) => cb(y));
 export const matrixForEachCol = (matrix: M, cb: (x: number) => unknown) => matrix[0].forEach((_el, x) => cb(x));
 
-export const matrixCols = (matrix: M, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
+export const matrixCols = <T = string>(matrix: M<T>, start = 0, end = Infinity) => matrix.map(row => row.slice(Math.max(0, start), end + 1));
 
 export const matrixMaxX = (matrix: M) => matrix[0].length - 1;
 export const matrixMaxY = (matrix: M) => matrix.length - 1;
-export const matrixSlice = (matrix: M, [[x1, y1], [x2, y2]]: BBox) => matrixCols(matrixRows(matrix, y1, y2), x1, x2);
+export const matrixSlice = <T = string>(matrix: M<T>, [[x1, y1], [x2, y2]]: BBox) => matrixCols(matrixRows(matrix, y1, y2), x1, x2);
 export const matrixClone = (matrix: M): M => [...matrix.map(line => [...line])];
 
 export const matrixEquals = (a: M, b: M) => a.length === b.length && matrixToString(a) === matrixToString(b);
@@ -70,10 +71,10 @@ export const matrixFindElements = <T = string>(matrix: M<T>, opts: ({
 | {
     predicate: (v: T, xy: XY) => boolean,
 }) & {
-    map?: (v: string, xy: XY) => string,
+    map?: <T>(v: T, xy: XY) => T,
     bbox?: BBox
 }): [XY, T][] => {
-    const res: [XY, string][] = [];
+    const res: [XY, T][] = [];
     let m = matrix, offsetX = 0, offsetY = 0;
     if (opts.bbox) {
         m = matrixSlice(matrix, opts.bbox);
