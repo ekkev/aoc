@@ -3,7 +3,7 @@ import { findPathsFlexi } from "./lib/path.ts";
 
 const matrix = matrixFromFile('23.in');
 const start = [1,0] as XY;
-const target = [matrixMaxX(matrix)-1,(matrixMaxY(matrix))] as XY;
+const target = [matrixMaxX(matrix)-1, matrixMaxY(matrix)] as XY;
 
 // Remove arrows from map
 matrixFindElements(matrix, {predicate: v => v !== '#' && v !== '.'}).forEach(([pos]) => matrixSet(matrix, pos, '.'));
@@ -36,10 +36,10 @@ for (const crossing of Object.values(crossings)) {
 
         const itFinder = findPathsFlexi<XY>({
             startNodes: [strt],
-            endCondition: (pos) => matrixGet(m2, pos) === 'X',
-            nextMovesFn: (pos) => xydirections(pos),
-            isValidMoveFn: (pos) => !xyequal(xpos, pos) && inMatrix(m2, pos) && matrixGet(m2, pos) !== '#',
-            cacheKeyFn: (pos: XY) => xykey(pos),
+            endCondition: pos => matrixGet(m2, pos) === 'X',
+            nextMovesFn: xydirections,
+            isValidMoveFn: pos => !xyequal(xpos, pos) && inMatrix(m2, pos) && matrixGet(m2, pos) !== '#',
+            cacheKeyFn: xykey,
         });
         const r = itFinder.next();
         crossing.paths[xykey(r.value.finalElement)] = r.value.finalCost + 1;

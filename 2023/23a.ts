@@ -5,7 +5,7 @@ const matrix = matrixFromFile('23.in');
 
 matrixPrint(matrix);
 const start = [1, 0] as XY;
-const target = [matrixMaxX(matrix)-1, (matrixMaxY(matrix))] as XY;
+const target = [matrixMaxX(matrix)-1, matrixMaxY(matrix)] as XY;
 
 const itFinder = findPathsFlexi<[XY, string[]]>({
     startNodes: [[start, []]],
@@ -20,7 +20,7 @@ const itFinder = findPathsFlexi<[XY, string[]]>({
         }
         return xydirections(pos).map(dir => [dir, [...path]]);
     },
-    isValidMoveFn: ([[x, y], path]) => inMatrix(matrix, [x, y]) && matrixGet(matrix, [x, y]) !== '#' && !path.includes(xykey([x,y])),
+    isValidMoveFn: ([pos, path]) => inMatrix(matrix, pos) && matrixGet(matrix, pos) !== '#' && !path.includes(xykey(pos)),
 });
 
 let max = 0;
