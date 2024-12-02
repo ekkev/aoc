@@ -1,5 +1,6 @@
 
 export const betweenExcluding = (v: number, a: number, b: number) => v > Math.min(a, b) && v < Math.max(a, b);
+export const betweenIncluding = (v: number, a: number, b: number) => v >= Math.min(a, b) && v <= Math.max(a, b);
 
 
 /**
