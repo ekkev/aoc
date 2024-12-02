@@ -1,0 +1,14 @@
+{
+    "deno.enable": true,
+    "deno.lint": true,
+    "saveAndRun": {
+        "commands": [
+          {
+            "match": "\\.ts$",
+            "cmd": "deno run --allow-all ${file}",
+            "useShortcut": false,
+            "silent": false
+          }
+        ]
+      }
+}

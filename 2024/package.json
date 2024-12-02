@@ -1,0 +1,29 @@
+{
+  "name": "aoc",
+  "version": "1.0.0",
+  "description": "Here live some believably ugly JS solutions for advent of code.",
+  "main": "index.js",
+  "scripts": {
+    "create-day": "cp template.ts \"$(date +%-d)a.ts\" && code \"$(date +%-d)a.ts\"",
+    "part-two": "cp -n \"$(date +%-d)a.ts\" \"$(date +%-d)b.ts\" && code \"$(date +%-d)b.ts\"",
+    "aoc-download": "aoc download -y 2024 --day \"$(date +%-d)\" --overwrite --input-file \"$(date +%-d).in\" --puzzle-file \"$(date +%-d).md\" && code \"$(date +%-d).in\" \"$(date +%-d).md\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekkev/aoc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekkev/aoc/issues"
+  },
+  "homepage": "https://github.com/ekkev/aoc#readme",
+  "dependencies": {
+    "bignumber.js": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "ts-node": "^10.9.2"
+  }
+}
