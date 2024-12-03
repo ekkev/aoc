@@ -6,7 +6,7 @@ declare global {
     interface Array<T> {
         sum(): number,
         product(): number,
-        count(el: T): number,
+        count(val?: T|((val: T, index?: number) => boolean)): number,
         tupleSortByKey(): T[],
         tupleValues <V>(): V[];
         tableColumns <TCell>(this: TCell[][]): TCell[][];
@@ -16,13 +16,20 @@ declare global {
 export const protosArray = () => {
     Array.prototype.sum = function s <T>() { return sum(this) }
     Array.prototype.product = function s <T>() { return product(this) }
-    Array.prototype.count = function s <T>(val: T) { return this.filter(v => v === val).length }
+    Array.prototype.count = function s <T>(val?: T | ((val: T, index?: number) => boolean)) { 
+        if (typeof val === 'function') {
+            return this.filter(val as ((val: T, index?: number) => boolean)).length
+        } else if (typeof val === 'undefined') {
+            return this.length;
+        } else {
+            return this.filter(v => v === val).length
+        }
+    }
     Array.prototype.tupleSortByKey = function s <T>() { return tupleSortByKey(this) };
     Array.prototype.tupleValues = function s <V>(): V[] { return tupleValues(this) };
 
     Array.prototype.tableColumns = function s <TCell>(this: TCell[][]): TCell[][] { return transposeMatrix<TCell>(this) };
 }
-
 
 export const arrayOfValue = <T>(length: number, value: T): T[] => Array.from({ length }, () => value);
 

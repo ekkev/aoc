@@ -1,3 +1,5 @@
 */node_modules
 */*.in
 */package-lock.json
+*/*.md
+node_modules
