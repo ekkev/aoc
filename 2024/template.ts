@@ -7,6 +7,8 @@ const tuples = File.tuples(FILE);
 const nums = File.numberList(FILE);
 //const matches = File.regex(FILE, /(...)/);
 const file = File.string(FILE);
+const matrix = File.charMatrix(FILE);
+
 
 let res = 0;
 
