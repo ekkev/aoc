@@ -22,6 +22,10 @@ export const tupleGroupByKey = <K extends TupleKey, V>(tuples: [K, V][]): [strin
 }
 
 
+export const tupleGroupByValue = <K extends string, V>(tuples: [V, K][]): [string, V[]][] => {
+    return tupleGroupByKey(tuples.map(([k, v]) => [v, k]));
+}
+
 export const tupleSortByKey = <K extends TupleKey, V>(tuples: [K, V][]) =>
     tuples.sort((a, b) => sanitizeKey(a[0]).localeCompare(sanitizeKey(b[0])))
 
@@ -59,5 +63,6 @@ export const tupleReduceInGroups = <K extends TupleKey, V, RV>(tuples: [K, V][],
 
 export const tupleKeys = <K extends TupleKey, V>(tuples: [K, V][]): K[] => tuples.map(([k, _]) => k);
 export const tupleValues = <K extends TupleKey, V>(tuples: [K, V][]): V[] => tuples.map(([_, v]) => v);
+export const tupleFlipKV = <K extends TupleKey, V>(tuples: [K, V][]): [V, K][] => tuples.map(([k, v]) => [v, k]);
 
 export const tupleObj = Object.fromEntries;

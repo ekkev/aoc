@@ -1,5 +1,6 @@
 import { transposeMatrix } from "./matrix.ts";
-import { tupleSortByKey, tupleValues, zip } from "./tuple.ts";
+import { tupleGroupByValue } from "./tuple.ts";
+import { TupleKey, tupleKeys, tupleSortByKey, tupleValues, zip } from "./tuple.ts";
 
 declare global {
 
@@ -8,8 +9,11 @@ declare global {
         product(): number,
         count(val?: T|((val: T, index?: number) => boolean)): number,
         tupleSortByKey(): T[],
-        tupleValues <V>(): V[];
+        tupleValues <V, K extends TupleKey>(this: [K, V][]): V[];
+        tupleKeys (): string[];
         tableColumns <TCell>(this: TCell[][]): TCell[][];
+        tupleFlipKV <K, V>(): [V, K][];
+        tupleGroupByValue <K extends string, V>(this: [V, K][]): [string, V[]][];
     }
 }
 
@@ -26,7 +30,10 @@ export const protosArray = () => {
         }
     }
     Array.prototype.tupleSortByKey = function s <T>() { return tupleSortByKey(this) };
-    Array.prototype.tupleValues = function s <V>(): V[] { return tupleValues(this) };
+    Array.prototype.tupleValues = function s <V, K extends TupleKey>(this: [K, V][]): V[] { return tupleValues(this) };
+    Array.prototype.tupleKeys = function s (): string[] { return tupleKeys(this) };
+    Array.prototype.tupleFlipKV = function s <K, V> (this: [K, V][]): [V, K][] { return this.map(([k, v]) => [v, k]) };
+    Array.prototype.tupleGroupByValue = function s <K extends string, V>(this: [V, K][]): [string, V[]][] { return tupleGroupByValue(this); }
 
     Array.prototype.tableColumns = function s <TCell>(this: TCell[][]): TCell[][] { return transposeMatrix<TCell>(this) };
 }

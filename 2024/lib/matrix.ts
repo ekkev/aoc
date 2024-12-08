@@ -7,6 +7,9 @@ export type XYZ = [number, number, number];
 export type BBox = [XY, XY];
 export type DirStr = "r" | "l" | "u" | "d";
 
+export const X = 0;
+export const Y = 1;
+
 export const matrixUp = ([x, y]: XY = [0, 0]): XY => [x, y - 1];
 export const matrixDown = ([x, y]: XY = [0, 0]): XY => [x, y + 1];
 export const matrixLeft = ([x, y]: XY = [0, 0]): XY => [x - 1, y];
@@ -48,6 +51,8 @@ export const xykey = ([x, y]: XY) => `${x},${y}`;
 export const xyequal = ([x1, y1]: XY, [x2, y2]: XY): boolean =>
   x1 === x2 && y1 === y2;
 export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1 + x2, y1 + y2];
+export const xysub = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1 - x2, y1 - y2];
+export const xymulN = ([x1, y1]: XY, n: number): XY => [n * x1, n * y1];
 
 export const matrixFromLines = (lines: string[]): M =>
   lines.map((line) => line.split(""));
@@ -70,6 +75,15 @@ export const matrixSet = <T = string>(matrix: M<T>, [x, y]: XY, v: T) => {
   }
   throw new Error(`No row ${y} in matrix`);
 };
+
+export const matrixSetIfInside = <T = string>(matrix: M<T>, pos: XY, v: T) => {
+  if (inMatrix(matrix, pos)) {
+    matrixSet(matrix, pos, v);
+    return true;
+  }
+
+  return false;
+}
 
 export const matrixForEachRow = (matrix: M, cb: (y: number) => unknown) =>
   matrix.forEach((_row, y) => cb(y));
@@ -291,5 +305,5 @@ export const matrixFindDiagonalPatterns = <T = string>(matrix: M, opts: {
 
 export const inBbox = (pos: XY, a: XY, b: XY) =>
   inRange(pos[0], a[0], b[0]) && inRange(pos[1], a[1], b[1]);
-export const inMatrix = (matrix: M, [x, y]: XY) =>
+export const inMatrix = <T = string>(matrix: M<T>, [x, y]: XY) =>
   x < matrix[0].length && x >= 0 && y >= 0 && y < matrix.length;
