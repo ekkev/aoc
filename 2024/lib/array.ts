@@ -7,6 +7,7 @@ declare global {
     interface Array<T> {
         sum(): number,
         product(): number,
+        split(predicate: (val: T) => boolean): [T[], T[]],
         count(val?: T|((val: T, index?: number) => boolean)): number,
         tupleSortByKey(): T[],
         tupleValues <V, K extends TupleKey>(this: [K, V][]): V[];
@@ -20,6 +21,9 @@ declare global {
 export const protosArray = () => {
     Array.prototype.sum = function s <T>() { return sum(this) }
     Array.prototype.product = function s <T>() { return product(this) }
+    Array.prototype.split = function s <T>(predicate: (val: T) => boolean): [T[], T[]] {
+        return [this.filter(predicate), this.filter(v => !predicate(v))];
+    }
     Array.prototype.count = function s <T>(val?: T | ((val: T, index?: number) => boolean)) { 
         if (typeof val === 'function') {
             return this.filter(val as ((val: T, index?: number) => boolean)).length
@@ -57,15 +61,6 @@ export const rangeAnyOrder = (from: number, to: number): number[] => from > to ?
     Array.from( { length: 1+to-from }, (_, index) => from + index)
 
 export const inRange = (num: number, a: number, b: number) => num <= Math.max(a, b) && num >= Math.min(a, b);
-
-export function findLastIndex(arr: string[], predicate: (s: string) => boolean) {
-    for (let i = arr.length - 1; i >= 0; i--) {
-        if (predicate(arr[i])) {
-            return i;
-        }
-    }
-    return -1;
-}
 
 export function* genRange(from: number, to: number) {
     while (to --> from) {
