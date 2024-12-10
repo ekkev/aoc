@@ -9,6 +9,7 @@ declare global {
         product(): number,
         split(predicate: (val: T) => boolean): [T[], T[]],
         count(val?: T|((val: T, index?: number) => boolean)): number,
+        countDistinct(): number,
         tupleSortByKey(): T[],
         tupleValues <V, K extends TupleKey>(this: [K, V][]): V[];
         tupleKeys (): string[];
@@ -33,6 +34,7 @@ export const protosArray = () => {
             return this.filter(v => v === val).length
         }
     }
+    Array.prototype.countDistinct = function s () { return new Set(this).size };
     Array.prototype.tupleSortByKey = function s <T>() { return tupleSortByKey(this) };
     Array.prototype.tupleValues = function s <V, K extends TupleKey>(this: [K, V][]): V[] { return tupleValues(this) };
     Array.prototype.tupleKeys = function s (): string[] { return tupleKeys(this) };

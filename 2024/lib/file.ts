@@ -55,5 +55,6 @@ export const File = {
   regex: fileAsMatches,
   lineByLine,
   charMatrix: (file: string) => fileAsLines(file).map(line => [...line]),
+  numberMatrix: (file: string) => fileAsLines(file).map(line => [...line.map(v => parseInt(v, 10))]),
   columns: (file: string) => transposeMatrix(fileAsLines(file).map(line => [...line])),
 };
