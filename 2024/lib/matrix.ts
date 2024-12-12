@@ -70,8 +70,9 @@ export const matrixGet = <T = string>(
 ): T | undefined => matrix[y] ? matrix[y][x] as T : undefined;
 export const matrixSet = <T = string>(matrix: M<T>, [x, y]: XY, v: T) => {
   if (matrix[y]) {
+    const oldvalue = matrix[y][x];
     matrix[y][x] = v;
-    return;
+    return oldvalue;
   }
   throw new Error(`No row ${y} in matrix`);
 };
