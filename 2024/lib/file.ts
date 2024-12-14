@@ -6,7 +6,7 @@ import { transposeMatrix } from './matrix.ts';
 export const fileAsString = (filename: string) => fs.readFileSync(filename, 'ascii');
 export const fileAsLines = (filename: string) => fs.readFileSync(filename, 'ascii').replace(/\n$/, '').split(/\n/);
 export const fileAsTuples = (filename: string) => fileAsLines(filename).map(l => l.split(/ +/));
-export const fileAsNumbers = (filename: string) => fileAsLines(filename).map(row => [...row.matchAll(/\d+/g)].map(({0: num}) => Number(num)));
+export const fileAsNumbers = (filename: string) => fileAsLines(filename).map(row => [...row.matchAll(/-?\d+/g)].map(({0: num}) => Number(num)));
 
 export const readAllLines = fileAsLines;
 
