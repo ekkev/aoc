@@ -24,12 +24,16 @@ export const xydirections = (pos: XY = [0, 0]): [XY, XY, XY, XY] => [
 export const xymove = (pos: XY, dir: DirStr | string) => {
   switch (dir) {
     case "r":
+    case ">":
       return matrixRight(pos);
     case "l":
+    case "<":
       return matrixLeft(pos);
     case "u":
+    case "^":
       return matrixUp(pos);
     case "d":
+    case "v":
       return matrixDown(pos);
   }
   throw new Error(`Unknown direction ${dir}`);
@@ -104,6 +108,8 @@ export const matrixCols = <T = string>(
 
 export const matrixMaxX = (matrix: M) => matrix[0].length - 1;
 export const matrixMaxY = (matrix: M) => matrix.length - 1;
+export const matrixWidth = (matrix: M) => matrix[0].length;
+export const matrixHeight = (matrix: M) => matrix.length;
 
 export const matrixSlice = <T = string>(
   matrix: M<T>,
