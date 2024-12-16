@@ -1,5 +1,5 @@
 import { File, globalProtos } from "./lib/index.ts";
-import { DirStr, XY, matrixFindElements, matrixGet, matrixSet, xydirturn, xyequal, xymove } from "./lib/matrix.ts";
+import { DirStr, matrixFindElements, matrixGet, matrixSet, xydirturn, xyequal, xymove } from "./lib/matrix.ts";
 import { findPathsFlexi } from "./lib/path.ts";
 globalProtos();
 
