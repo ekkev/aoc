@@ -59,7 +59,8 @@ export function *findPathsFlexi<T>(opts: {
     endCondition?: (el: T, cost: number) => boolean,
     nextMovesFn: (el: T) => T[],
     cacheKeyFn?: (el: T, cost: number) => string|undefined,
-    isValidMoveFn?: (to: T, from: T) => boolean,
+    cacheEvictFn?: (el: T, cacheKey: string, cost: number) => void,
+    isValidMoveFn?: (to: T, from: T, cost: number) => boolean,
     costFn?: (node: T, prevCost: number, prevNode: T) => number,
     beforeMoveFn?: (el: T, cost: number) => void;
 }
@@ -69,7 +70,7 @@ export function *findPathsFlexi<T>(opts: {
         opts.cacheKeyFn = () => undefined;
     }
     if (!opts.isValidMoveFn) {
-        opts.isValidMoveFn = () => true;
+        //opts.isValidMoveFn = () => true;
     }
     if (!opts.costFn) {
         opts.costFn = (_, prevCost) => prevCost + 1;
@@ -77,7 +78,7 @@ export function *findPathsFlexi<T>(opts: {
 
     const highCostFirst = opts.prioritizeHighCost ?? false;
 
-    const {startNodes, nextMovesFn, cacheKeyFn, isValidMoveFn, costFn} = opts;
+    const {startNodes, nextMovesFn, cacheKeyFn, costFn} = opts;
 
     const q = new PriorityQueue<T>(startNodes);
     const visited: Set<string | undefined> = new Set(startNodes.map(cacheKeyFn));
@@ -97,7 +98,10 @@ export function *findPathsFlexi<T>(opts: {
             continue;
         }
 
-        const nextMoves = nextMovesFn(current).filter(move => isValidMoveFn(move, current));
+        let nextMoves = nextMovesFn(current)
+        if (opts.isValidMoveFn) {
+            nextMoves = nextMoves.filter(move => opts.isValidMoveFn!(move, current, cost));
+        }
         for (const move of nextMoves) {
             const key = cacheKeyFn(move, cost);
 
@@ -105,6 +109,10 @@ export function *findPathsFlexi<T>(opts: {
                 visited.add(key);
 
                 q.enqueue(move, costFn(move, cost, current));
+            } else {
+                if (opts.cacheEvictFn) {
+                    opts.cacheEvictFn(move, key, cost);
+                }
             }
         };
     }
