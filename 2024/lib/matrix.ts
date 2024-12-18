@@ -81,6 +81,8 @@ export const matrixSet = <T = string>(matrix: M<T>, [x, y]: XY, v: T) => {
   throw new Error(`No row ${y} in matrix`);
 };
 
+export const matrixSetter = <T = string>(matrix: M<T>, v: T) => (pos: XY) => matrixSet(matrix, pos, v);
+
 export const matrixSetIfInside = <T = string>(matrix: M<T>, pos: XY, v: T) => {
   if (inMatrix(matrix, pos)) {
     matrixSet(matrix, pos, v);
