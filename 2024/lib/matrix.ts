@@ -51,12 +51,16 @@ export const xydirturn = (dir: DirStr, turn: "l" | "r"): DirStr =>
     "dl": "r",
   })[[dir, turn].join("")] as DirStr;
 
-export const xykey = ([x, y]: XY) => `${x},${y}`;
+export type XYKey = `${number},${number}`;
+export const xykey = ([x, y]: XY): XYKey => `${x},${y}`;
+export const xyunkey = (key: XYKey | string): XY => key.split(',') as unknown as XY;
 export const xyequal = ([x1, y1]: XY, [x2, y2]: XY): boolean =>
   x1 === x2 && y1 === y2;
 export const xyadd = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1 + x2, y1 + y2];
 export const xysub = ([x1, y1]: XY, [x2, y2]: XY): XY => [x1 - x2, y1 - y2];
 export const xymulN = ([x1, y1]: XY, n: number): XY => [n * x1, n * y1];
+
+export const xydistance = ([x1, y1]: XY, [x2, y2]: XY) => Math.abs(x1 - x2) + Math.abs(y1 - y2)
 
 export const matrixFromLines = (lines: string[]): M =>
   lines.map((line) => line.split(""));
