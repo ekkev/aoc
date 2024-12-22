@@ -139,6 +139,7 @@ export const matrixPrint = (
     .forEach((line) =>
       console.log(line.map(opts.replacer ?? ((v) => v)).join(""))
     );
+export const matrixFirstPosOf = <T = string>(matrix: M<T>, needle: T): XY => matrixFindElements(matrix, {value: needle})[0][0];
 
 export const matrixFindElements = <T = string>(
   matrix: M<T>,
