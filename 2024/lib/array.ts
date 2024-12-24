@@ -99,6 +99,8 @@ export const frequencyMap = countElementsInGroups;
 // Sort helpers
 export const sortCompareNumericDesc = (a: number, b: number) => b - a;
 export const sortCompareNumericAsc = (a: number, b: number) => a - b;
+export const sortCompareStringcDesc = (a: string, b: string) => a === b ? 0 : a < b ? 1 : -1;
+export const sortCompareStringcAsc = (a: string, b: string) => a === b ? 0 : a > b ? 1 : -1;
 
 
 
